@@ -1,0 +1,21 @@
+.box {
+  display: var(--box-display, flex);
+  flex-direction: var(--box-flex-direction, row);
+  justify-content: var(--box-justify-content, flex-start);
+  align-items: var(--box-align-items, stretch);
+  padding: var(--box-padding, 0);
+  padding-top: var(--box-padding-top, 0);
+  padding-right: var(--box-padding-right, 0);
+  padding-bottom: var(--box-padding-bottom, 0);
+  padding-left: var(--box-padding-left, 0);
+  margin: var(--box-margin, 0);
+  margin-top: var(--box-margin-top, 0);
+  margin-right: var(--box-margin-right, 0);
+  margin-bottom: var(--box-margin-bottom, 0);
+  margin-left: var(--box-margin-left, 0);
+  background-color: var(--box-bg-color, transparent);
+  color: var(--box-text-color, inherit);
+  border: var(--box-border, none);
+  border-radius: var(--box-border-radius, 0);
+  box-shadow: var(--box-box-shadow, none);
+}

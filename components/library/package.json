@@ -1,10 +1,10 @@
 {
   "name": "arka-component-library",
-  "version": "1.0.2",
+  "version": "1.0.8",
   "description": "A reusable component library",
   "main": "dist/index.js",
   "scripts": {
-    "build": "babel src --out-dir dist && cp -r src/Button/*.scss dist/Button",
+    "build": "babel src --out-dir dist && cp -r src/Button/*.scss dist/Button && cp -r src/Box/*.scss dist/Box",
     "prepublishOnly": "npm run build"
   },
   "repository": {
