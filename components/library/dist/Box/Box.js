@@ -8,7 +8,7 @@ var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _BoxModule = _interopRequireDefault(require("./Box.module.scss"));
 var _clsx = _interopRequireDefault(require("clsx"));
-var _excluded = ["display", "flexDirection", "justifyContent", "alignItems", "padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "margin", "marginTop", "marginRight", "marginBottom", "marginLeft", "bgColor", "textColor", "border", "borderRadius", "boxShadow", "children", "className"];
+var _excluded = ["display", "flexDirection", "justifyContent", "alignItems", "padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "margin", "marginTop", "marginRight", "marginBottom", "marginLeft", "width", "height", "bgColor", "textColor", "border", "borderRadius", "boxShadow", "children", "className"];
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], t.indexOf(o) >= 0 || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
@@ -42,6 +42,10 @@ var Box = function Box(_ref) {
     marginBottom = _ref$marginBottom === void 0 ? "0" : _ref$marginBottom,
     _ref$marginLeft = _ref.marginLeft,
     marginLeft = _ref$marginLeft === void 0 ? "0" : _ref$marginLeft,
+    _ref$width = _ref.width,
+    width = _ref$width === void 0 ? "auto" : _ref$width,
+    _ref$height = _ref.height,
+    height = _ref$height === void 0 ? "auto" : _ref$height,
     _ref$bgColor = _ref.bgColor,
     bgColor = _ref$bgColor === void 0 ? "transparent" : _ref$bgColor,
     _ref$textColor = _ref.textColor,
@@ -71,6 +75,8 @@ var Box = function Box(_ref) {
     "--box-margin-right": marginRight,
     "--box-margin-bottom": marginBottom,
     "--box-margin-left": marginLeft,
+    "--box-width": width,
+    "--box-height": height,
     "--box-bg-color": bgColor,
     "--box-text-color": textColor,
     "--box-border": border,
@@ -97,6 +103,8 @@ Box.propTypes = {
   marginRight: _propTypes["default"].string,
   marginBottom: _propTypes["default"].string,
   marginLeft: _propTypes["default"].string,
+  width: _propTypes["default"].string,
+  height: _propTypes["default"].string,
   bgColor: _propTypes["default"].string,
   textColor: _propTypes["default"].string,
   border: _propTypes["default"].string,

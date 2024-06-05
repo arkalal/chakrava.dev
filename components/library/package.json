@@ -1,6 +1,6 @@
 {
   "name": "arka-component-library",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A reusable component library",
   "main": "dist/index.js",
   "scripts": {

@@ -13,6 +13,8 @@
   margin-right: var(--box-margin-right, 0);
   margin-bottom: var(--box-margin-bottom, 0);
   margin-left: var(--box-margin-left, 0);
+  width: var(--box-width, auto);
+  height: var(--box-height, auto);
   background-color: var(--box-bg-color, transparent);
   color: var(--box-text-color, inherit);
   border: var(--box-border, none);
