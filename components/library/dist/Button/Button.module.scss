@@ -1,0 +1,17 @@
+.button {
+  padding: var(--button-padding, 10px 20px);
+  margin: var(--button-margin, 5px);
+  background-color: var(--button-bg-color, blue);
+  color: var(--button-text-color, white);
+  border: var(--button-border, 1px solid black);
+  border-radius: var(--button-border-radius, 4px);
+  width: var(--button-width, auto);
+  height: var(--button-height, auto);
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+
+  &:hover {
+    background-color: var(--button-hover-bg-color, darkblue);
+    color: var(--button-hover-text-color, white);
+  }
+}
