@@ -1,40 +1,13 @@
 import NextAuth from "next-auth/next";
-import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import connectMongoDB from "../../../../../utils/mongoDB";
+import User from "../../../../../models/User";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
 export const authOptions = {
   providers: [
-    // Credentials({
-    //   name: "credentials",
-    //   credentials: {},
-
-    //   async authorize(credentials) {
-    //     const { email, password } = credentials;
-
-    //     try {
-    //       await connectMongoDB();
-    //       const user = await NewUserAuth.findOne({ email });
-
-    //       if (!user) {
-    //         return null;
-    //       }
-
-    //       const passwordMatch = await bcrypt.compare(password, user.password);
-
-    //       if (!passwordMatch) {
-    //         return null;
-    //       }
-
-    //       return user;
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
-    //   },
-    // }),
-
     GoogleProvider({
       clientId: googleClientId,
       clientSecret: googleClientSecret,
@@ -45,13 +18,43 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login",
+    signIn: "/",
   },
   callbacks: {
-    async signIn(user, account, profile) {
-      if (!profile.email) {
-        throw new Error("No profile found");
+    async signIn({ user, account, profile }) {
+      await connectMongoDB();
+
+      // Check if the user already exists
+      const existingUser = await User.findOne({ email: user.email });
+
+      if (existingUser) {
+        // Update user details if changed
+        existingUser.name = user.name;
+        existingUser.image = user.image;
+        await existingUser.save();
+      } else {
+        // Create new user
+        await User.create({
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        });
       }
+
+      return true;
+    },
+    async session({ session, token, user }) {
+      await connectMongoDB();
+
+      const existingUser = await User.findOne({ email: session.user.email });
+
+      if (existingUser) {
+        session.user.id = existingUser._id;
+        session.user.name = existingUser.name;
+        session.user.image = existingUser.image;
+      }
+
+      return session;
     },
   },
 };
