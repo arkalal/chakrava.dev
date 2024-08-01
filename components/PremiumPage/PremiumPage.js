@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "../../axios/api";
+import Wallet from "../Wallet/Wallet";
 
 const PremiumPage = () => {
   const { data: session } = useSession();
@@ -34,6 +35,8 @@ const PremiumPage = () => {
               <button onClick={handleManageSubscription}>
                 Manage Subscription
               </button>
+
+              <Wallet />
             </>
           ) : (
             <button onClick={handleSubscribe}>Subscribe for $20/month</button>

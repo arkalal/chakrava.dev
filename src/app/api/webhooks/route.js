@@ -50,7 +50,6 @@ export async function POST(req) {
   const handleSubscription = async (subscription) => {
     console.log("Handling subscription:", subscription);
 
-    // Retrieve the customer email from Stripe
     const customer = await stripe.customers.retrieve(subscription.customer);
     const customerEmail = customer.email;
 
@@ -61,7 +60,6 @@ export async function POST(req) {
       return;
     }
 
-    // Update user with Stripe customer ID if not already set
     if (!user.stripeCustomerId) {
       user.stripeCustomerId = subscription.customer;
     }
@@ -80,9 +78,16 @@ export async function POST(req) {
       subscriptionsArray[subscriptionIndex].status = subscription.status;
     }
 
-    // Update the main subscription status
     user.subscriptionStatus = subscription.status;
     user.subscriptions = subscriptionsArray;
+
+    if (user.referredBy) {
+      const referrer = await User.findById(user.referredBy);
+      if (referrer) {
+        referrer.wallet += 10;
+        await referrer.save();
+      }
+    }
 
     console.log(`Updating user with ID: ${user._id}`);
     try {
@@ -96,7 +101,6 @@ export async function POST(req) {
   const handleInvoice = async (invoice, status) => {
     console.log("Handling invoice:", invoice);
 
-    // Retrieve the customer email from Stripe
     const customer = await stripe.customers.retrieve(invoice.customer);
     const customerEmail = customer.email;
 

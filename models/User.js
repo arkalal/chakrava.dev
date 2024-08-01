@@ -18,11 +18,18 @@ const userSchema = new Schema(
     email: { type: String, unique: true },
     image: String,
     stripeCustomerId: String,
+    stripeAccountId: String,
     subscriptionStatus: {
       type: String,
       enum: ["active", "past_due", "canceled", "incomplete"],
       default: "canceled",
     },
+    wallet: {
+      type: Number,
+      default: 0,
+    },
+    referralId: String,
+    referredBy: String,
     subscriptions: [subscriptionSchema],
   },
   {

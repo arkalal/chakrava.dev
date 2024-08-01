@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "../../../axios/api";
 import Subscription from "../../../components/Subscription/Subscription";
+import ReferralForm from "../../../components/ReferralForm/ReferralForm";
 
 const getPricing = async () => {
   try {
@@ -17,6 +18,7 @@ const Pricing = async () => {
 
   return (
     <div>
+      <ReferralForm />
       <Subscription priceData={priceData}></Subscription>
     </div>
   );
