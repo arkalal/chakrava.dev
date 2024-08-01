@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
+import Stripe from "stripe";
 import connectMongoDB from "../../../../utils/mongoDB";
 import User from "../../../../models/User";
+
+const stripe = new Stripe(process.env.STRIPE_API_KEY, {
+  apiVersion: "2022-08-01",
+});
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
