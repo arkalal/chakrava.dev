@@ -2,13 +2,9 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import connectMongoDB from "../../../../../utils/mongoDB";
 import User from "../../../../../models/User";
-import Stripe from "stripe";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-  apiVersion: "2022-08-01",
-});
 
 export const authOptions = {
   providers: [
@@ -25,7 +21,7 @@ export const authOptions = {
     signIn: "/",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       await connectMongoDB();
 
       // Check if the user already exists
@@ -37,24 +33,18 @@ export const authOptions = {
         existingUser.image = user.image;
         await existingUser.save();
       } else {
-        // Create a new Stripe customer
-        const stripeCustomer = await stripe.customers.create({
-          email: user.email,
-          name: user.name,
-        });
-
-        // Create a new user
+        // Create a new user without Stripe customer ID
         await User.create({
           name: user.name,
           email: user.email,
           image: user.image,
-          stripeCustomerId: stripeCustomer.id, // Save the Stripe customer ID
+          stripeCustomerId: "", // Initially empty
         });
       }
 
       return true;
     },
-    async session({ session, token, user }) {
+    async session({ session }) {
       await connectMongoDB();
 
       const existingUser = await User.findOne({ email: session.user.email });

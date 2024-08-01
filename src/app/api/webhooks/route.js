@@ -54,15 +54,16 @@ export async function POST(req) {
     const customer = await stripe.customers.retrieve(subscription.customer);
     const customerEmail = customer.email;
 
-    const user = await User.findOne({
-      email: customerEmail,
-    });
+    const user = await User.findOne({ email: customerEmail });
 
     if (!user) {
       console.error(`User not found for customer email: ${customerEmail}`);
-      const users = await User.find({});
-      console.log("Current users in the database:", users);
       return;
+    }
+
+    // Update user with Stripe customer ID if not already set
+    if (!user.stripeCustomerId) {
+      user.stripeCustomerId = subscription.customer;
     }
 
     const subscriptionsArray = user.subscriptions || [];
@@ -103,8 +104,6 @@ export async function POST(req) {
 
     if (!user) {
       console.error(`User not found for customer email: ${customerEmail}`);
-      const users = await User.find({});
-      console.log("Current users in the database:", users);
       return;
     }
 
@@ -143,8 +142,6 @@ export async function POST(req) {
 
         if (!user) {
           console.error(`User not found for customer email: ${customerEmail}`);
-          const users = await User.find({});
-          console.log("Current users in the database:", users);
           return;
         }
 

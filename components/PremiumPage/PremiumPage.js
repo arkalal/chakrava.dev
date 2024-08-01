@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import axios from "../../axios/api";
 
 const PremiumPage = () => {
   const { data: session } = useSession();
@@ -9,6 +10,17 @@ const PremiumPage = () => {
 
   const handleSubscribe = async () => {
     router.push("/pricing");
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const res = await axios.post("manageSubscription", {
+        userId: session.user.id,
+      });
+      window.location.href = res.data;
+    } catch (error) {
+      console.log("Error creating billing portal session:", error);
+    }
   };
 
   return (
@@ -19,6 +31,9 @@ const PremiumPage = () => {
             <>
               <h1>Premium Content</h1>
               <p>Welcome to the premium content!</p>
+              <button onClick={handleManageSubscription}>
+                Manage Subscription
+              </button>
             </>
           ) : (
             <button onClick={handleSubscribe}>Subscribe for $20/month</button>
