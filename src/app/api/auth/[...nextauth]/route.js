@@ -1,10 +1,14 @@
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import connectMongoDB from "../../../../../utils/mongoDB";
 import User from "../../../../../models/User";
+import Stripe from "stripe";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const stripe = new Stripe(process.env.STRIPE_API_KEY, {
+  apiVersion: "2022-08-01",
+});
 
 export const authOptions = {
   providers: [
@@ -33,11 +37,18 @@ export const authOptions = {
         existingUser.image = user.image;
         await existingUser.save();
       } else {
-        // Create new user
+        // Create a new Stripe customer
+        const stripeCustomer = await stripe.customers.create({
+          email: user.email,
+          name: user.name,
+        });
+
+        // Create a new user
         await User.create({
           name: user.name,
           email: user.email,
           image: user.image,
+          stripeCustomerId: stripeCustomer.id, // Save the Stripe customer ID
         });
       }
 
@@ -52,6 +63,8 @@ export const authOptions = {
         session.user.id = existingUser._id;
         session.user.name = existingUser.name;
         session.user.image = existingUser.image;
+        session.user.stripeCustomerId = existingUser.stripeCustomerId; // Include stripeCustomerId in the session
+        session.user.subscriptionStatus = existingUser.subscriptionStatus; // Include subscriptionStatus in the session
       }
 
       return session;

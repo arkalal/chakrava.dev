@@ -1,9 +1,9 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import connectMongoDB from "../../../../utils/mongoDB";
-import User from "../../../../models/User";
 import { Readable } from "stream";
 import { headers } from "next/headers";
+import connectMongoDB from "../../../../utils/mongoDB";
+import User from "../../../../models/User";
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: "2022-08-01",
@@ -48,25 +48,84 @@ export async function POST(req) {
   await connectMongoDB();
 
   const handleSubscription = async (subscription) => {
-    await User.findOneAndUpdate(
-      { stripeCustomerId: subscription.customer },
-      {
-        subscriptionStatus: subscription.status,
-        $set: {
-          "subscriptions.$[element].status": subscription.status,
-        },
-      },
-      {
-        arrayFilters: [{ "element.priceId": subscription.plan.id }],
-      }
+    console.log("Handling subscription:", subscription);
+
+    // Retrieve the customer email from Stripe
+    const customer = await stripe.customers.retrieve(subscription.customer);
+    const customerEmail = customer.email;
+
+    const user = await User.findOne({
+      email: customerEmail,
+    });
+
+    if (!user) {
+      console.error(`User not found for customer email: ${customerEmail}`);
+      const users = await User.find({});
+      console.log("Current users in the database:", users);
+      return;
+    }
+
+    const subscriptionsArray = user.subscriptions || [];
+    const subscriptionIndex = subscriptionsArray.findIndex(
+      (sub) => sub.priceId === subscription.plan.id
     );
+
+    if (subscriptionIndex === -1) {
+      subscriptionsArray.push({
+        priceId: subscription.plan.id,
+        status: subscription.status,
+      });
+    } else {
+      subscriptionsArray[subscriptionIndex].status = subscription.status;
+    }
+
+    // Update the main subscription status
+    user.subscriptionStatus = subscription.status;
+    user.subscriptions = subscriptionsArray;
+
+    console.log(`Updating user with ID: ${user._id}`);
+    try {
+      const result = await user.save();
+      console.log("Database update result for subscription:", result);
+    } catch (err) {
+      console.error("Error saving user:", err);
+    }
   };
 
   const handleInvoice = async (invoice, status) => {
-    await User.findOneAndUpdate(
-      { stripeCustomerId: invoice.customer },
-      { subscriptionStatus: status }
-    );
+    console.log("Handling invoice:", invoice);
+
+    // Retrieve the customer email from Stripe
+    const customer = await stripe.customers.retrieve(invoice.customer);
+    const customerEmail = customer.email;
+
+    const user = await User.findOne({ email: customerEmail });
+
+    if (!user) {
+      console.error(`User not found for customer email: ${customerEmail}`);
+      const users = await User.find({});
+      console.log("Current users in the database:", users);
+      return;
+    }
+
+    user.subscriptionStatus = status;
+    console.log(`Updating user with ID: ${user._id}`);
+    try {
+      const result = await user.save();
+      console.log("Database update result for invoice:", result);
+    } catch (err) {
+      console.error("Error saving user:", err);
+    }
+  };
+
+  const handleCheckoutSessionCompleted = async (session) => {
+    console.log("Handling checkout.session.completed:", session);
+    if (session.subscription) {
+      const subscription = await stripe.subscriptions.retrieve(
+        session.subscription
+      );
+      await handleSubscription(subscription);
+    }
   };
 
   const eventMap = new Map([
@@ -75,9 +134,33 @@ export async function POST(req) {
     [
       "customer.subscription.deleted",
       async (subscription) => {
-        await User.findOneAndUpdate(
-          { stripeCustomerId: subscription.customer },
-          { subscriptionStatus: "canceled" }
+        const customer = await stripe.customers.retrieve(subscription.customer);
+        const customerEmail = customer.email;
+
+        const user = await User.findOne({
+          email: customerEmail,
+        });
+
+        if (!user) {
+          console.error(`User not found for customer email: ${customerEmail}`);
+          const users = await User.find({});
+          console.log("Current users in the database:", users);
+          return;
+        }
+
+        user.subscriptionStatus = "canceled";
+        const subscriptionIndex = user.subscriptions.findIndex(
+          (sub) => sub.priceId === subscription.plan.id
+        );
+        if (subscriptionIndex !== -1) {
+          user.subscriptions[subscriptionIndex].status = "canceled";
+        }
+
+        console.log(`Updating user with ID: ${user._id}`);
+        const result = await user.save();
+        console.log(
+          "Database update result for subscription deletion:",
+          result
         );
       },
     ],
@@ -89,6 +172,18 @@ export async function POST(req) {
       "invoice.payment_failed",
       async (invoice) => handleInvoice(invoice, "past_due"),
     ],
+    ["checkout.session.completed", handleCheckoutSessionCompleted],
+    ["customer.updated", () => {}],
+    ["payment_intent.requires_action", () => {}],
+    ["payment_intent.created", () => {}],
+    ["customer.created", () => {}],
+    ["invoice.finalized", () => {}],
+    ["invoice.payment_action_required", () => {}],
+    ["invoice.updated", () => {}],
+    ["invoice.created", () => {}],
+    ["charge.succeeded", () => {}],
+    ["payment_method.attached", () => {}],
+    ["invoice.paid", () => {}],
   ]);
 
   if (eventMap.has(event.type)) {

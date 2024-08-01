@@ -1,5 +1,17 @@
 import mongoose, { Schema } from "mongoose";
 
+const subscriptionSchema = new Schema(
+  {
+    priceId: String,
+    status: {
+      type: String,
+      enum: ["active", "canceled", "past_due", "unpaid", "incomplete"],
+      default: "incomplete",
+    },
+  },
+  { _id: false }
+);
+
 const userSchema = new Schema(
   {
     name: String,
@@ -8,19 +20,10 @@ const userSchema = new Schema(
     stripeCustomerId: String,
     subscriptionStatus: {
       type: String,
-      enum: ["active", "past_due", "canceled"],
+      enum: ["active", "past_due", "canceled", "incomplete"],
       default: "canceled",
     },
-    subscriptions: [
-      {
-        priceId: String,
-        status: {
-          type: String,
-          enum: ["active", "canceled", "past_due", "unpaid", "incomplete"],
-          default: "incomplete",
-        },
-      },
-    ],
+    subscriptions: [subscriptionSchema],
   },
   {
     timestamps: true,
