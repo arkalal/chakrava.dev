@@ -25,6 +25,7 @@ export async function createStripeAccountLink(formData) {
     const account = await stripe.accounts.create({
       type: "standard",
       email: user.email,
+      country: "US",
     });
     user.stripeAccountId = account.id;
     await user.save();
