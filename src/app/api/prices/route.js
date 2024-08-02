@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-  apiVersion: "2022-08-01",
-});
+const stripe = new Stripe(process.env.STRIPE_API_KEY);
 
 export async function GET() {
   try {
+    console.log("Fetching Stripe prices...");
+    console.log("Stripe API Key:", process.env.STRIPE_API_KEY);
+
     const prices = await stripe.prices.list({
       limit: 10, // Adjust the limit based on your needs
     });
+
+    console.log("Prices fetched successfully:", prices);
+
     return NextResponse.json(prices.data);
   } catch (error) {
     console.error("Error fetching prices:", error);

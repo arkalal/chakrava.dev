@@ -11,6 +11,8 @@ const Pricing = ({ priceData }) => {
     setReferralId(e.target.value);
   };
 
+  console.log("priceData", priceData);
+
   return (
     <div>
       {/* <ReferralForm /> */}
