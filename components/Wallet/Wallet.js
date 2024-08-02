@@ -26,7 +26,7 @@ const Wallet = () => {
 
   const handlePayout = async () => {
     try {
-      const res = await axios.post("wallet", {
+      const res = await axios.post("api/wallet", {
         userId: session.user.id,
         amount,
       });

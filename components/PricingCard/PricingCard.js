@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "../../axios/api";
 
-const PricingCard = ({ data }) => {
+const PricingCard = ({ data, referralId }) => {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -17,6 +17,7 @@ const PricingCard = ({ data }) => {
       const res = await axios.post("checkout", {
         userId: session.user.id,
         priceId: data.id,
+        referralId,
       });
       router.push(res.data);
     } catch (error) {

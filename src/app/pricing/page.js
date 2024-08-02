@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "../../../axios/api";
-import Subscription from "../../../components/Subscription/Subscription";
-import ReferralForm from "../../../components/ReferralForm/ReferralForm";
+import Pricing from "../../../components/Pricing/Pricing";
 
 const getPricing = async () => {
   try {
@@ -12,16 +11,14 @@ const getPricing = async () => {
   }
 };
 
-const Pricing = async () => {
+const page = async () => {
   const priceData = await getPricing();
-  console.log("priceData", priceData);
 
   return (
     <div>
-      <ReferralForm />
-      <Subscription priceData={priceData}></Subscription>
+      <Pricing priceData={priceData} />
     </div>
   );
 };
 
-export default Pricing;
+export default page;

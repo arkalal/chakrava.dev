@@ -10,12 +10,25 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY, {
 
 export async function POST(req) {
   try {
-    const { userId, priceId } = await req.json();
+    const { userId, priceId, referralId } = await req.json();
     await connectMongoDB();
     const user = await User.findById(userId);
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (referralId) {
+      const referrer = await User.findOne({ referralId });
+      if (referrer) {
+        user.referredBy = referrer._id;
+        await user.save();
+      } else {
+        return NextResponse.json(
+          { error: "Invalid referral ID" },
+          { status: 400 }
+        );
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
