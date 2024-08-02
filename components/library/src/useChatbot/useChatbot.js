@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useChat } from "ai/react";
-import { baseUrlStaging, baseUrlTest } from "../../../../axios/baseUrl";
+import {
+  baseUrlProd,
+  baseUrlStaging,
+  baseUrlTest,
+} from "../../../../axios/baseUrl";
 
 const useChatbot = ({
   model = "gpt-3.5-turbo",
@@ -17,7 +21,7 @@ const useChatbot = ({
     handleInputChange,
     handleSubmit,
   } = useChat({
-    api: `${baseUrlStaging}/api/chat`,
+    api: `${baseUrlProd}/api/chat`,
     body: {
       model,
       outputLength,

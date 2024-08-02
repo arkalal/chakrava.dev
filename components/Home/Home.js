@@ -3,6 +3,7 @@
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import PremiumPage from "../PremiumPage/PremiumPage";
 
 const Home = () => {
   const { data: session } = useSession();
@@ -25,6 +26,8 @@ const Home = () => {
       ) : (
         <button onClick={() => signIn("google")}>Sign In with Google</button>
       )}
+
+      <PremiumPage />
     </div>
   );
 };

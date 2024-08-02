@@ -1,4 +1,4 @@
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import connectMongoDB from "../../../../../utils/mongoDB";
 import User from "../../../../../models/User";
@@ -21,29 +21,29 @@ export const authOptions = {
     signIn: "/",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       await connectMongoDB();
 
-      // Check if the user already exists
       const existingUser = await User.findOne({ email: user.email });
 
       if (existingUser) {
-        // Update user details if changed
         existingUser.name = user.name;
         existingUser.image = user.image;
         await existingUser.save();
       } else {
-        // Create new user
         await User.create({
           name: user.name,
           email: user.email,
           image: user.image,
+          stripeCustomerId: "",
+          stripeAccountId: "",
+          referralId: "",
         });
       }
 
       return true;
     },
-    async session({ session, token, user }) {
+    async session({ session }) {
       await connectMongoDB();
 
       const existingUser = await User.findOne({ email: session.user.email });
@@ -52,6 +52,11 @@ export const authOptions = {
         session.user.id = existingUser._id;
         session.user.name = existingUser.name;
         session.user.image = existingUser.image;
+        session.user.stripeCustomerId = existingUser.stripeCustomerId;
+        session.user.stripeAccountId = existingUser.stripeAccountId;
+        session.user.subscriptionStatus = existingUser.subscriptionStatus;
+        session.user.wallet = existingUser.wallet;
+        session.user.referralId = existingUser.referralId;
       }
 
       return session;
