@@ -9,13 +9,6 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: "2022-08-01",
 });
 
-// New route segment configuration
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 function buffer(readable) {
   return new Promise((resolve, reject) => {
     const chunks = [];
