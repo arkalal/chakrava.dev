@@ -9,6 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: "2022-08-01",
 });
 
+// New route segment configuration
 export const config = {
   api: {
     bodyParser: false,
@@ -40,9 +41,7 @@ export async function POST(req) {
     );
   } catch (err) {
     console.error(`Webhook Error: ${err.message}`);
-    return new NextResponse(JSON.stringify({ error: "Webhook Error" }), {
-      status: 400,
-    });
+    return NextResponse.json({ error: "Webhook Error" }, { status: 400 });
   }
 
   await connectMongoDB();
@@ -193,5 +192,5 @@ export async function POST(req) {
     console.log(`Unhandled event type ${event.type}`);
   }
 
-  return new NextResponse(JSON.stringify({ received: true }), { status: 200 });
+  return NextResponse.json({ received: true }, { status: 200 });
 }
