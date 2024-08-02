@@ -23,7 +23,7 @@ export async function POST(req) {
       return_url: `${baseUrlTest}`,
     });
 
-    return NextResponse.json(session.url);
+    return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Error creating billing portal session:", error);
     return NextResponse.json(
