@@ -41,6 +41,7 @@ export async function POST(req) {
         },
       ],
       customer_email: user.email,
+      billing_address_collection: "required",
       success_url: `${baseUrlStaging}`,
       cancel_url: `${baseUrlStaging}`,
     });

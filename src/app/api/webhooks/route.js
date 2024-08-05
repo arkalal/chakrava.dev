@@ -90,29 +90,6 @@ export async function POST(req) {
     }
   };
 
-  const handleInvoice = async (invoice, status) => {
-    console.log("Handling invoice:", invoice);
-
-    const customer = await stripe.customers.retrieve(invoice.customer);
-    const customerEmail = customer.email;
-
-    const user = await User.findOne({ email: customerEmail });
-
-    if (!user) {
-      console.error(`User not found for customer email: ${customerEmail}`);
-      return;
-    }
-
-    user.subscriptionStatus = status;
-    console.log(`Updating user with ID: ${user._id}`);
-    try {
-      const result = await user.save();
-      console.log("Database update result for invoice:", result);
-    } catch (err) {
-      console.error("Error saving user:", err);
-    }
-  };
-
   const handleCheckoutSessionCompleted = async (session) => {
     console.log("Handling checkout.session.completed:", session);
     if (session.subscription) {
@@ -157,26 +134,7 @@ export async function POST(req) {
         );
       },
     ],
-    [
-      "invoice.payment_succeeded",
-      async (invoice) => handleInvoice(invoice, "active"),
-    ],
-    [
-      "invoice.payment_failed",
-      async (invoice) => handleInvoice(invoice, "past_due"),
-    ],
     ["checkout.session.completed", handleCheckoutSessionCompleted],
-    ["customer.updated", () => {}],
-    ["payment_intent.requires_action", () => {}],
-    ["payment_intent.created", () => {}],
-    ["customer.created", () => {}],
-    ["invoice.finalized", () => {}],
-    ["invoice.payment_action_required", () => {}],
-    ["invoice.updated", () => {}],
-    ["invoice.created", () => {}],
-    ["charge.succeeded", () => {}],
-    ["payment_method.attached", () => {}],
-    ["invoice.paid", () => {}],
   ]);
 
   if (eventMap.has(event.type)) {
