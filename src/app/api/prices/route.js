@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_API_KEY);
+const stripe = new Stripe(
+  "sk_test_51PidbBSFWUyFMrsbtKbxsmr1QOF0QE8xUJmTmwwZcUXRsQ1vDnxJGM4a4RzBHsS9JP23n4DFUMM7S1XAT5kXJCYt00o9OYLxcA"
+);
 
 export async function GET() {
   try {

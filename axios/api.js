@@ -5,6 +5,7 @@ const instance = axios.create({
   baseURL: `${baseUrlStaging}/api/`,
   headers: {
     "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
   },
 });
 
