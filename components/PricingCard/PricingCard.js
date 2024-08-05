@@ -29,7 +29,7 @@ const PricingCard = ({ data, referralId }) => {
     <div className={styles.PricingCard}>
       <h3>{data.nickname}</h3>
       <p>
-        ${(data.unit_amount / 100).toFixed(2)} per {data.recurring.interval}
+        ${(data.unit_amount / 100).toFixed(2)} per {data?.recurring?.interval}
       </p>
       <button onClick={handleSubscribe}>Subscribe</button>
     </div>
