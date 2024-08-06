@@ -19,6 +19,7 @@ const userSchema = new Schema(
     image: String,
     stripeCustomerId: String,
     stripeAccountId: String,
+    razorpaySubscriptionId: String,
     subscriptionStatus: {
       type: String,
       enum: ["active", "past_due", "canceled", "incomplete"],
