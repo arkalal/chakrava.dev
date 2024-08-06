@@ -1,16 +1,25 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-  apiVersion: "2022-08-01",
-});
+const stripe = new Stripe(process.env.STRIPE_API_KEY);
 
-export async function GET() {
+export async function GET(req) {
   try {
+    console.log("Fetching Stripe prices...");
+    console.log("Stripe API Key:", process.env.STRIPE_API_KEY);
+
     const prices = await stripe.prices.list({
-      limit: 10, // Adjust the limit based on your needs
+      limit: 10,
+      expand: ["data.product"], // Include the product data in the response
     });
-    return NextResponse.json(prices.data);
+
+    const filteredPrices = prices.data.filter(
+      (price) => price.nickname === "chakrava.dev - Premium India"
+    );
+
+    console.log("Prices fetched and filtered successfully:", filteredPrices);
+
+    return NextResponse.json(filteredPrices);
   } catch (error) {
     console.error("Error fetching prices:", error);
     return NextResponse.json(

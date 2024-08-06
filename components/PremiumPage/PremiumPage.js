@@ -4,43 +4,21 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Wallet from "../Wallet/Wallet";
 import { useState, useEffect } from "react";
-import axios from "../../axios/api"; // Adjust path as necessary
-import { createStripeAccountLink } from "../../utils/actions";
+import axios from "../../axios/api";
 
 const PremiumPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [referralId, setReferralId] = useState("");
 
-  console.log("session", session);
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const res = await axios.get(`user/${session.user.id}`);
-        setReferralId(res.data.referralId);
-      } catch (error) {
-        console.log("Error fetching user details:", error);
-      }
-    };
-
-    if (session) {
-      fetchUserDetails();
-    }
-  }, [session]);
-
   const handleSubscribe = async () => {
-    router.push("/pricing");
-  };
-
-  const handleManageSubscription = async () => {
     try {
-      const res = await axios.post("manageSubscription", {
+      const res = await axios.post("subscription", {
         userId: session.user.id,
       });
-      window.location.href = res.data.url;
+      window.location.href = res.data.short_url; // Redirect to Razorpay payment page
     } catch (error) {
-      console.log("Error creating billing portal session:", error);
+      console.log("Error creating subscription:", error);
     }
   };
 
@@ -52,14 +30,7 @@ const PremiumPage = () => {
             <>
               <h1>Premium Content</h1>
               <p>Welcome to the premium content!</p>
-              <button onClick={handleManageSubscription}>
-                Manage Subscription
-              </button>
               <Wallet />
-              <form action={createStripeAccountLink}>
-                <input type="hidden" name="userId" value={session.user.id} />
-                <button type="submit">Join as Affiliate</button>
-              </form>
               {referralId && (
                 <div>
                   <p>Your Referral ID: {referralId}</p>
@@ -72,7 +43,7 @@ const PremiumPage = () => {
               )}
             </>
           ) : (
-            <button onClick={handleSubscribe}>Subscribe for $20/month</button>
+            <button onClick={handleSubscribe}>Subscribe for ₹850/month</button>
           )}
         </>
       ) : (

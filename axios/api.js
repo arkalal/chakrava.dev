@@ -1,10 +1,11 @@
 import axios from "axios";
-import { baseUrlProd, baseUrlStaging, baseUrlTest } from "./baseUrl";
+import { baseUrlNG, baseUrlProd, baseUrlStaging, baseUrlTest } from "./baseUrl";
 
 const instance = axios.create({
   baseURL: `${baseUrlProd}/api/`,
   headers: {
     "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
   },
 });
 
