@@ -1,147 +1,83 @@
-import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import { Readable } from "stream";
-import { headers } from "next/headers";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 import connectMongoDB from "../../../../utils/mongoDB";
 import User from "../../../../models/User";
 
-const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-  apiVersion: "2022-08-01",
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-function buffer(readable) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    readable.on("data", (chunk) => {
-      chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-    });
-    readable.on("end", () => resolve(Buffer.concat(chunks)));
-    readable.on("error", reject);
-  });
-}
-
 export async function POST(req) {
-  let event;
+  console.log("Webhook received");
 
-  try {
-    const rawBody = await buffer(Readable.from(req.body));
-    const sig = headers().get("Stripe-Signature");
+  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
-    event = stripe.webhooks.constructEvent(
-      rawBody.toString(),
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.error(`Webhook Error: ${err.message}`);
-    return NextResponse.json({ error: "Webhook Error" }, { status: 400 });
+  // Parse raw body for signature verification
+  const chunks = [];
+  for await (const chunk of req.body) {
+    chunks.push(chunk);
   }
+  const rawBody = Buffer.concat(chunks).toString("utf8");
+
+  console.log("Raw Body:", rawBody);
+
+  // Verify signature
+  const shasum = crypto.createHmac("sha256", secret);
+  shasum.update(rawBody);
+  const digest = shasum.digest("hex");
+
+  const headerSignature = req.headers["x-razorpay-signature"];
+  console.log("Digest:", digest);
+  console.log("Header Signature:", headerSignature);
+
+  if (!headerSignature) {
+    console.log("Missing header signature");
+    return NextResponse.json(
+      { error: "Missing header signature" },
+      { status: 400 }
+    );
+  }
+
+  if (digest !== headerSignature) {
+    console.log("Invalid signature");
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
+
+  const parsedBody = JSON.parse(rawBody);
+  const event = parsedBody.event;
+  const payload = parsedBody.payload;
+
+  console.log("Event:", event);
+  console.log("Payload:", JSON.stringify(payload, null, 2));
 
   await connectMongoDB();
 
-  const handleSubscription = async (subscription) => {
-    console.log("Handling subscription:", subscription);
+  if (event === "subscription.charged") {
+    console.log("Handling subscription.charged event");
+    const subscription = payload.subscription.entity;
+    console.log("Subscription:", subscription);
 
-    const customer = await stripe.customers.retrieve(subscription.customer);
-    const customerEmail = customer.email;
+    const user = await User.findOne({
+      razorpaySubscriptionId: subscription.id,
+    });
 
-    const user = await User.findOne({ email: customerEmail });
-
-    if (!user) {
-      console.error(`User not found for customer email: ${customerEmail}`);
-      return;
-    }
-
-    if (!user.stripeCustomerId) {
-      user.stripeCustomerId = subscription.customer;
-    }
-
-    const subscriptionsArray = user.subscriptions || [];
-    const subscriptionIndex = subscriptionsArray.findIndex(
-      (sub) => sub.priceId === subscription.plan.id
-    );
-
-    if (subscriptionIndex === -1) {
-      subscriptionsArray.push({
-        priceId: subscription.plan.id,
-        status: subscription.status,
-      });
+    if (user) {
+      console.log("User found:", user);
+      user.subscriptionStatus = "active";
+      await user.save();
+      console.log("User updated");
     } else {
-      subscriptionsArray[subscriptionIndex].status = subscription.status;
+      console.log("User not found");
     }
-
-    user.subscriptionStatus = subscription.status;
-    user.subscriptions = subscriptionsArray;
-
-    if (user.referredBy) {
-      const referrer = await User.findById(user.referredBy);
-      if (referrer) {
-        referrer.wallet += 10;
-        await referrer.save();
-      }
-    }
-
-    console.log(`Updating user with ID: ${user._id}`);
-    try {
-      const result = await user.save();
-      console.log("Database update result for subscription:", result);
-    } catch (err) {
-      console.error("Error saving user:", err);
-    }
-  };
-
-  const handleCheckoutSessionCompleted = async (session) => {
-    console.log("Handling checkout.session.completed:", session);
-    if (session.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(
-        session.subscription
-      );
-      await handleSubscription(subscription);
-    }
-  };
-
-  const eventMap = new Map([
-    ["customer.subscription.created", handleSubscription],
-    ["customer.subscription.updated", handleSubscription],
-    [
-      "customer.subscription.deleted",
-      async (subscription) => {
-        const customer = await stripe.customers.retrieve(subscription.customer);
-        const customerEmail = customer.email;
-
-        const user = await User.findOne({
-          email: customerEmail,
-        });
-
-        if (!user) {
-          console.error(`User not found for customer email: ${customerEmail}`);
-          return;
-        }
-
-        user.subscriptionStatus = "canceled";
-        const subscriptionIndex = user.subscriptions.findIndex(
-          (sub) => sub.priceId === subscription.plan.id
-        );
-        if (subscriptionIndex !== -1) {
-          user.subscriptions[subscriptionIndex].status = "canceled";
-        }
-
-        console.log(`Updating user with ID: ${user._id}`);
-        const result = await user.save();
-        console.log(
-          "Database update result for subscription deletion:",
-          result
-        );
-      },
-    ],
-    ["checkout.session.completed", handleCheckoutSessionCompleted],
-  ]);
-
-  if (eventMap.has(event.type)) {
-    await eventMap.get(event.type)(event.data.object);
+  } else if (event === "payment.authorized") {
+    console.log("Handling payment.authorized event");
+  } else if (event === "payment.failed") {
+    console.log("Handling payment.failed event");
   } else {
-    console.log(`Unhandled event type ${event.type}`);
+    console.log("Unhandled event type:", event);
   }
 
-  return NextResponse.json({ received: true }, { status: 200 });
+  return NextResponse.json({ status: "ok" });
 }
