@@ -23,13 +23,7 @@ export async function POST(req) {
 
   console.log("Raw Body:", rawBody);
 
-  // Verify signature
-  const shasum = crypto.createHmac("sha256", secret);
-  shasum.update(rawBody);
-  const digest = shasum.digest("hex");
-
   const headerSignature = req.headers["x-razorpay-signature"];
-  console.log("Digest:", digest);
   console.log("Header Signature:", headerSignature);
 
   if (!headerSignature) {
@@ -40,12 +34,23 @@ export async function POST(req) {
     );
   }
 
-  if (digest !== headerSignature) {
+  // Verify signature using Razorpay's built-in method
+  try {
+    razorpay.webhooks.verifySignature({ rawBody, secret }, headerSignature);
+  } catch (error) {
     console.log("Invalid signature");
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const parsedBody = JSON.parse(rawBody);
+  // Parse the JSON body
+  let parsedBody;
+  try {
+    parsedBody = JSON.parse(rawBody);
+  } catch (error) {
+    console.log("Error parsing JSON:", error);
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
   const event = parsedBody.event;
   const payload = parsedBody.payload;
 
@@ -73,8 +78,10 @@ export async function POST(req) {
     }
   } else if (event === "payment.authorized") {
     console.log("Handling payment.authorized event");
+    // Add your logic for payment authorized event
   } else if (event === "payment.failed") {
     console.log("Handling payment.failed event");
+    // Add your logic for payment failed event
   } else {
     console.log("Unhandled event type:", event);
   }
