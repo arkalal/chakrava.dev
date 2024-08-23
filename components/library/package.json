@@ -1,6 +1,6 @@
 {
   "name": "chakrava-dev",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A Generative AI powered component library for React and Next.js",
   "main": "dist/index.js",
   "scripts": {
