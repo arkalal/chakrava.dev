@@ -13,6 +13,26 @@ function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default":
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], t.indexOf(o) >= 0 || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
 function _objectWithoutPropertiesLoose(r, e) { if (null == r) return {}; var t = {}; for (var n in r) if ({}.hasOwnProperty.call(r, n)) { if (e.indexOf(n) >= 0) continue; t[n] = r[n]; } return t; }
+/**
+ * Box component for layout and structure.
+ *
+ * @param {object} props - Props object
+ * @param {string} [props.display="flex"] - Display type of the box
+ * @param {string} [props.flexDirection="row"] - Flex direction of the box
+ * @param {string} [props.justifyContent="flex-start"] - Justify content style
+ * @param {string} [props.alignItems="stretch"] - Align items style
+ * @param {string} [props.padding="0"] - Padding inside the box
+ * @param {string} [props.margin="0"] - Margin around the box
+ * @param {string} [props.width="auto"] - Width of the box
+ * @param {string} [props.height="auto"] - Height of the box
+ * @param {string} [props.bgColor="transparent"] - Background color of the box
+ * @param {string} [props.textColor="inherit"] - Text color inside the box
+ * @param {string} [props.border="none"] - Border style of the box
+ * @param {string} [props.borderRadius="0"] - Border radius of the box
+ * @param {string} [props.boxShadow="none"] - Box shadow of the box
+ * @param {React.ReactNode} props.children - Content inside the box
+ * @param {string} [props.className=""] - Additional class names for the box
+ */
 var Box = function Box(_ref) {
   var _ref$display = _ref.display,
     display = _ref$display === void 0 ? "flex" : _ref$display,

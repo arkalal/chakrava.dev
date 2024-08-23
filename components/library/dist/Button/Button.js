@@ -13,6 +13,24 @@ function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default":
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], t.indexOf(o) >= 0 || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
 function _objectWithoutPropertiesLoose(r, e) { if (null == r) return {}; var t = {}; for (var n in r) if ({}.hasOwnProperty.call(r, n)) { if (e.indexOf(n) >= 0) continue; t[n] = r[n]; } return t; }
+/**
+ * Button component for user interactions.
+ *
+ * @param {object} props - Props object
+ * @param {string} [props.padding="10px 20px"] - Padding for the button
+ * @param {string} [props.margin="5px"] - Margin for the button
+ * @param {string} [props.bgColor="blue"] - Background color of the button
+ * @param {string} [props.textColor="white"] - Text color of the button
+ * @param {string} [props.border="1px solid black"] - Border style of the button
+ * @param {string} [props.borderRadius="4px"] - Border radius of the button
+ * @param {string} [props.width="auto"] - Width of the button
+ * @param {string} [props.height="auto"] - Height of the button
+ * @param {string} [props.boxShadow="none"] - Box shadow of the button
+ * @param {string} [props.hoverBgColor="darkblue"] - Background color on hover
+ * @param {string} [props.hoverTextColor="white"] - Text color on hover
+ * @param {React.ReactNode} props.children - Button content
+ * @param {string} [props.className=""] - Additional class names for the button
+ */
 var Button = function Button(_ref) {
   var _ref$padding = _ref.padding,
     padding = _ref$padding === void 0 ? "10px 20px" : _ref$padding,

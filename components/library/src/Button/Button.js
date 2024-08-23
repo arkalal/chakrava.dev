@@ -3,6 +3,24 @@ import PropTypes from "prop-types";
 import styles from "./Button.module.scss";
 import clsx from "clsx";
 
+/**
+ * Button component for user interactions.
+ *
+ * @param {object} props - Props object
+ * @param {string} [props.padding="10px 20px"] - Padding for the button
+ * @param {string} [props.margin="5px"] - Margin for the button
+ * @param {string} [props.bgColor="blue"] - Background color of the button
+ * @param {string} [props.textColor="white"] - Text color of the button
+ * @param {string} [props.border="1px solid black"] - Border style of the button
+ * @param {string} [props.borderRadius="4px"] - Border radius of the button
+ * @param {string} [props.width="auto"] - Width of the button
+ * @param {string} [props.height="auto"] - Height of the button
+ * @param {string} [props.boxShadow="none"] - Box shadow of the button
+ * @param {string} [props.hoverBgColor="darkblue"] - Background color on hover
+ * @param {string} [props.hoverTextColor="white"] - Text color on hover
+ * @param {React.ReactNode} props.children - Button content
+ * @param {string} [props.className=""] - Additional class names for the button
+ */
 const Button = ({
   padding = "10px 20px",
   margin = "5px",

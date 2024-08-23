@@ -3,6 +3,26 @@ import PropTypes from "prop-types";
 import styles from "./Box.module.scss";
 import clsx from "clsx";
 
+/**
+ * Box component for layout and structure.
+ *
+ * @param {object} props - Props object
+ * @param {string} [props.display="flex"] - Display type of the box
+ * @param {string} [props.flexDirection="row"] - Flex direction of the box
+ * @param {string} [props.justifyContent="flex-start"] - Justify content style
+ * @param {string} [props.alignItems="stretch"] - Align items style
+ * @param {string} [props.padding="0"] - Padding inside the box
+ * @param {string} [props.margin="0"] - Margin around the box
+ * @param {string} [props.width="auto"] - Width of the box
+ * @param {string} [props.height="auto"] - Height of the box
+ * @param {string} [props.bgColor="transparent"] - Background color of the box
+ * @param {string} [props.textColor="inherit"] - Text color inside the box
+ * @param {string} [props.border="none"] - Border style of the box
+ * @param {string} [props.borderRadius="0"] - Border radius of the box
+ * @param {string} [props.boxShadow="none"] - Box shadow of the box
+ * @param {React.ReactNode} props.children - Content inside the box
+ * @param {string} [props.className=""] - Additional class names for the box
+ */
 const Box = ({
   display = "flex",
   flexDirection = "row",

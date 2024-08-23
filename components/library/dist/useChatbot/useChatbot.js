@@ -1,9 +1,24 @@
 import { useEffect, useRef } from "react";
 import { useChat } from "ai/react";
 
-const baseUrlStaging = "https://chakrava-dev.vercel.app"; // Staging/Production URL
-const baseUrlTest = "http://localhost:3001"; // Local Development URL
-
+/**
+ * Hook to use a chatbot with OpenAI GPT models.
+ *
+ * @param {object} config - Configuration object
+ * @param {string} [config.model="gpt-3.5-turbo"] - The model to use
+ * @param {string} [config.apiKey=""] - OpenAI API Key
+ * @param {number} [config.outputLength=512] - Maximum length of the output
+ * @param {number} [config.temperature=0.7] - Sampling temperature
+ * @param {number} [config.topP=1.0] - Nucleus sampling rate
+ * @param {number} [config.topK=50] - Top-K sampling rate
+ * @param {number} [config.repetitionPenalty=1.0] - Repetition penalty
+ * @returns {object} Hook state and functions
+ * @returns {Array} hookState.messages - Array of messages
+ * @returns {string} hookState.input - Current input
+ * @returns {function} hookState.handleInputChange - Function to handle input change
+ * @returns {function} hookState.handleSubmit - Function to submit the input
+ * @returns {object} hookState.messagesEndRef - Ref to the end of the messages
+ */
 const useChatbot = ({
   model = "gpt-3.5-turbo",
   apiKey = "",
@@ -19,9 +34,7 @@ const useChatbot = ({
     handleInputChange,
     handleSubmit,
   } = useChat({
-    api: `${
-      process.env.NODE_ENV === "production" ? baseUrlStaging : baseUrlTest
-    }/api/chat`, // Conditional URL based on environment
+    api: "https://www.chakrava.dev/api/chat",
     body: {
       model,
       outputLength,
