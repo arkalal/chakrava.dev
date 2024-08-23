@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useChat } from "ai/react";
 
+const baseUrlStaging = "https://chakrava-dev.vercel.app"; // Staging/Production URL
+const baseUrlTest = "http://localhost:3001"; // Local Development URL
+
 const useChatbot = ({
   model = "gpt-3.5-turbo",
   apiKey = "",
@@ -16,7 +19,9 @@ const useChatbot = ({
     handleInputChange,
     handleSubmit,
   } = useChat({
-    api: "http://localhost:3001/api/chat",
+    api: `${
+      process.env.NODE_ENV === "production" ? baseUrlStaging : baseUrlTest
+    }/api/chat`, // Conditional URL based on environment
     body: {
       model,
       outputLength,
