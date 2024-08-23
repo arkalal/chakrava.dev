@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useChat } from "ai/react";
 
-const baseUrlStaging = "https://chakrava-dev.vercel.app"; // Staging/Production URL
-const baseUrlTest = "http://localhost:3001"; // Local Development URL
 const baseUrlProd = "https://www.chakrava.dev";
 
 const useChatbot = ({
