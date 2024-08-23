@@ -2,14 +2,12 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Wallet from "../Wallet/Wallet";
 import { useState, useEffect } from "react";
 import axios from "../../axios/api";
 
 const PremiumPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const [referralId, setReferralId] = useState("");
 
   const handleSubscribe = async () => {
     try {
@@ -30,17 +28,6 @@ const PremiumPage = () => {
             <>
               <h1>Premium Content</h1>
               <p>Welcome to the premium content!</p>
-              <Wallet />
-              {referralId && (
-                <div>
-                  <p>Your Referral ID: {referralId}</p>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(referralId)}
-                  >
-                    Copy Referral ID
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <button onClick={handleSubscribe}>Subscribe for ₹850/month</button>

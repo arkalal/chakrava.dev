@@ -17,20 +17,12 @@ const userSchema = new Schema(
     name: String,
     email: { type: String, unique: true },
     image: String,
-    stripeCustomerId: String,
-    stripeAccountId: String,
     razorpaySubscriptionId: String,
     subscriptionStatus: {
       type: String,
       enum: ["active", "past_due", "canceled", "incomplete"],
       default: "canceled",
     },
-    wallet: {
-      type: Number,
-      default: 0,
-    },
-    referralId: String,
-    referredBy: String,
     subscriptions: [subscriptionSchema],
   },
   {

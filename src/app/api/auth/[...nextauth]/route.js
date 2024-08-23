@@ -35,13 +35,8 @@ export const authOptions = {
           name: user.name,
           email: user.email,
           image: user.image,
-          stripeCustomerId: "",
-          stripeAccountId: "",
           razorpaySubscriptionId: "",
           subscriptionStatus: "canceled",
-          wallet: 0,
-          referralId: "",
-          referredBy: "",
           subscriptions: [],
         });
       }
@@ -57,13 +52,9 @@ export const authOptions = {
         session.user.id = existingUser._id;
         session.user.name = existingUser.name;
         session.user.image = existingUser.image;
-        session.user.stripeCustomerId = existingUser.stripeCustomerId;
-        session.user.stripeAccountId = existingUser.stripeAccountId;
         session.user.razorpaySubscriptionId =
           existingUser.razorpaySubscriptionId;
         session.user.subscriptionStatus = existingUser.subscriptionStatus;
-        session.user.wallet = existingUser.wallet;
-        session.user.referralId = existingUser.referralId;
       }
 
       return session;
