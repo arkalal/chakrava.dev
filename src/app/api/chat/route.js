@@ -14,6 +14,10 @@ function addCorsHeaders(response) {
 }
 
 export async function POST(req) {
+  if (req.method === "OPTIONS") {
+    return OPTIONS();
+  }
+
   try {
     const {
       messages,
